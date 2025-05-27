@@ -11,3 +11,7 @@ DB configuration file has not been uploaded due to confidential information. Bel
     "collName": ""
 }
 
+# Server
+
+Run `npm run local` to start server with nodemon
+Run `node index.js` for prod
