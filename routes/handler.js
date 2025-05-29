@@ -6,18 +6,30 @@ router.get('/', (req, res) => {
     res.send("Hello World");
 });
 router.post('/data', async (req, res) => {
-    console.log(req.body);
-    await insert(req.body).catch(err=>console.error(err));
-    res.send("Save new data!!");
+    const id = await insert(req.body).catch((err) => {
+        console.error(err);
+        res.status(500).send({ message: err.message });
+    });
+    res.send({ 
+        _id: id,
+        msg: "Saved new data!!"
+    });
 });
 router.get('/alldata', async (req, res) => {
     // const data = require('../Dummy/data');
-    const data = await getAll().catch(err=>console.error(err));
+    const data = await getAll().catch((err) => {
+        console.error(err);
+        res.status(500).send({ message: err.message });
+    });
     res.send(data);
 });
 router.get('/data', async (req, res) => {
     const obj = req.query;
-    const data = await getByQuery(obj).catch(err=>console.error(err));
+
+    const data = await getByQuery(obj).catch((err) => {
+        console.error(err);
+        res.status(500).send({ message: err.message });
+    });
     console.log(data);
     if(data){
         res.send(data);
@@ -27,22 +39,22 @@ router.get('/data', async (req, res) => {
 });
 router.delete('/delete/:id', async (req,res)=>{
     const id = req.params.id;
-    try{
-        await deleteById(id).catch(err=>console.error(err));
-        res.send(`Delete ${id} success`);
-    }catch(e){
-        res.status(500).send({message:e.message});
-    }
+
+    await deleteById(id).catch((err) => {
+        console.error(err);
+        res.status(500).send({ message: err.message });
+    });
+    res.send(`Delete ${id} success`);
 });
 router.put('/update/:id', async (req,res)=>{
     const id = req.params.id;
     const newData = req.body;
-    try{
-        await updateById(id, newData).catch(err=>console.error(err));
-        res.send(`Update ${id} success`);
-    }catch(e){
-        res.status(500).send({message:e.message});
-    }
+
+    await updateById(id, newData).catch((err )=> {
+        console.error(err);
+        res.status(500).send({ message: err.message });
+    });
+    res.send(`Update ${id} success`);
 });
 
 module.exports = router;

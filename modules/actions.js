@@ -1,10 +1,12 @@
 const { client, collection } = require("./connection");
+const { ObjectId } = require("mongodb");
 
 async function insert(data) {
     try {
+        delete data._id;
         await client.connect();
         const msg = await collection.insertOne(data);
-        console.log("db:", msg);
+        return msg.insertedId;
     }
     finally {
         await client.close();
@@ -33,7 +35,6 @@ async function getByQuery(obj) {
 }
 
 async function getOne(query) {
-    console.log('1 query:', query);
     try {
         await client.connect();
         return await collection.findOne(query);
@@ -44,7 +45,6 @@ async function getOne(query) {
 }
 
 async function getSome(query) {
-    console.log('2 query:', query);
     try {
         await client.connect();
         return await collection.find(query).toArray();
@@ -66,6 +66,7 @@ async function deleteById(id) {
 
 async function updateById(id, newData) {
     try {
+        delete newData._id;
         await client.connect();
         return await collection.updateOne(
             { _id: new ObjectId(id + '') },
