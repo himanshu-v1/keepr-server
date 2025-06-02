@@ -1,8 +1,14 @@
-const { client, collection } = require("./connection");
 const { ObjectId } = require("mongodb");
+const getConnection = require("../utilities/connection");
+const getConfigData = require('../utilities/readConfig');
 
-async function insert(data) {
+const configFilePath = '../config.json';
+const configData = getConfigData(configFilePath);
+let { client, collection } = {};
+
+async function insert(user, data) {
     try {
+        ({ client, collection } = getConnection(user));
         delete data._id;
         await client.connect();
         const msg = await collection.insertOne(data);
@@ -13,8 +19,9 @@ async function insert(data) {
     }
 }
 
-async function getAll() {
+async function getAll(user) {
     try {
+        ({ client, collection } = getConnection(user));
         await client.connect();
         return await collection.find().toArray();
     }
@@ -23,7 +30,8 @@ async function getAll() {
     }
 }
 
-async function getByQuery(obj) {
+async function getByQuery(user, obj) {
+    ({ client, collection } = getConnection(user));
     let query = {};
     if(Object.keys(obj)[0] === 'id') {
         query._id = new ObjectId(obj.id+'');
@@ -54,8 +62,9 @@ async function getSome(query) {
     }
 }
 
-async function deleteById(id) {
+async function deleteById(user, id) {
     try {
+        ({ client, collection } = getConnection(user));
         await client.connect();
         return await collection.deleteOne({ _id: new ObjectId(id + '') });
     }
@@ -64,8 +73,9 @@ async function deleteById(id) {
     }
 }
 
-async function updateById(id, newData) {
+async function updateById(user, id, newData) {
     try {
+        ({ client, collection } = getConnection(user));
         delete newData._id;
         await client.connect();
         return await collection.updateOne(
